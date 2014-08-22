@@ -73,7 +73,7 @@ prereqs() {
     exit 1
   fi
 
-  # 2. running aufs 
+  # 2. running aufs
   test=`$docker_path info 2> /dev/null | grep 'Driver: aufs'`
   if [[ "$test" =~ "aufs" ]] ; then : ; else
     echo "Your Docker installation is not using aufs, in the past we have had issues with it"
@@ -217,6 +217,15 @@ RUBY
       echo "YAML syntax error. Please check your /var/docker/containers/*.yml config files."
       exit 1
     fi
+
+    if (echo "${env[@]}" | grep -q "DISCOURSE_SMTP_PORT" && echo "${env[@]}" | grep -q "DISCOURSE_SMTP_USER_NAME" && echo "${env[@]}" | grep -q "DISCOURSE_SMTP_PASSWORD"); then
+      echo "${env[@]}"
+      read -p "You are about to bootstrap with no mail configured, this is generally not a good idea. Proceed?" yn
+      case $yn in
+          [Nn]* ) exit;;
+      esac
+    fi
+
     echo "Calculated ENV: ${env[@]}"
 }
 
